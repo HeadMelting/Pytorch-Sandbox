@@ -131,3 +131,8 @@ cnn_model = CNN(input_shape = 3,
                 output_shape = 3)
 
 ```
+
+### References
+
+- [Making Deep Learning Go Brrrr From First Principles](https://horace.io/brrr_intro.html)
+- [CNN Explainer](https://poloclub.github.io/cnn-explainer)
