@@ -3,3 +3,7 @@
 *.pyc
 *.gz
 *-ubyte
+
+*.png
+*.zip
+entropy/*

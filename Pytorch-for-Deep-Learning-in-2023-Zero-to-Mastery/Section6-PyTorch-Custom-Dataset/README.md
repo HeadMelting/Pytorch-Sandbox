@@ -171,3 +171,4 @@ train_transform = transforms.Compose([transforms.Resize(size=(224,224),
 | Train for longer                                                                                              | Sometimes a model just needs more time to learn representations of data.                                                                            |
 | Use transfer learning                                                                                         | Take model's pre-learned patterns from one problem and tweak them to suit your own problem.                                                         |
 | Use less regularization                                                                                       | Perhaps your model is under-fitting because you're trying to prevent over-fitting too much.                                                         |
+
