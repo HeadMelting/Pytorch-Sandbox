@@ -3,9 +3,50 @@ import torch.nn as nn
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+# S
+class SimpleMultiple(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.embed = nn.Linear(2, 8)
+        self.l1 = nn.Linear(8, 8)
+        self.l2 = nn.Linear(8, 8)
+        self.l3 = nn.Linear(8, 8)
+        self.l4 = nn.Linear(8, 8)
+
+        self.linear1 = nn.Linear(in_features=8,
+                                 out_features=32)
+        self.linear2 = nn.Linear(in_features=32,
+                                 out_features=8)
+
+        self.head = nn.Linear(8, 1)
+        self.act = nn.LeakyReLU()
+
+    def forward(self, x):
+        x = self.embed(x)
+        wx1 = self.l1(x)
+
+        x2 = self.act(wx1 * x) + wx1
+        wx2 = self.l2(x2)
+
+        x3 = wx2 * x
+        wx3 = self.l2(x3)
+
+        x4 = self.act(wx3 * x) + wx3
+        wx4 = self.l3(x4)
+
+        out = self.linear1(wx4)
+
+        out = self.act(out)
+
+        out = self.linear2(out)
+
+        out = self.head(out)
+
+        return out
+
+
 # MODEL
-
-
 class SimpleMLP(nn.Module):
     def __init__(self,
                  input_features: int,
@@ -43,6 +84,23 @@ class SimpleMLP(nn.Module):
         return self.linear_layer_stack(x)
 
 
+class SimpleVAE(nn.Module):
+    def __init__(self):
+        self.embed = nn.Linear(3, 128)
+        self.fc_mu = nn.Linear()
+
+        self.encoder = nn.Sequential(
+            nn.Linear(128, 64),
+            nn.LeakyReLU(),
+            nn.Linear(64, 32),
+            nn.LeakyReLU(),
+            nn.Linear(32, 16),
+            nn.LeakyReLU(),
+        )
+
+        self.decoder = nn.Sequential()
+
+
 # Dataset
 x, y = np.meshgrid(np.linspace(0, 1, 130), np.linspace(0, 1, 130))
 
@@ -66,15 +124,19 @@ features = features.to(device)
 z1, z2, z3 = z1.to(device), z2.to(device), z3.to(device)
 
 # Init Models
-model1 = SimpleMLP(input_features=2,
-                   output_features=1,
-                   hidden_units=64).to(device)
-model2 = SimpleMLP(input_features=2,
-                   output_features=1,
-                   hidden_units=64).to(device)
-model3 = SimpleMLP(input_features=2,
-                   output_features=1,
-                   hidden_units=64).to(device)
+# model1 = SimpleMLP(input_features=2,
+#                    output_features=1,
+#                    hidden_units=64).to(device)
+# model2 = SimpleMLP(input_features=2,
+#                    output_features=1,
+#                    hidden_units=64).to(device)
+# model3 = SimpleMLP(input_features=2,
+#                    output_features=1,
+#                    hidden_units=64).to(device)
+
+model1 = SimpleMultiple().to(device)
+model2 = SimpleMultiple().to(device)
+model3 = SimpleMultiple().to(device)
 
 
 # Init optimizer and loss functions
@@ -84,15 +146,15 @@ optimizer2 = torch.optim.SGD(model2.parameters(), lr=1e-1)
 optimizer3 = torch.optim.SGD(model3.parameters(), lr=1e-1)
 
 # Train Test Split
-X_train = features[:11000]
-z1_train = z1[:11000].unsqueeze(1)
-z2_train = z2[:11000].unsqueeze(1)
-z3_train = z3[:11000].unsqueeze(1)
+X_train = features[:14000]
+z1_train = z1[:14000].unsqueeze(1)
+z2_train = z2[:14000].unsqueeze(1)
+z3_train = z3[:14000].unsqueeze(1)
 
-X_test = features[11000:]
-z1_test = z1[11000:].unsqueeze(1)
-z2_test = z2[11000:].unsqueeze(1)
-z3_test = z3[11000:].unsqueeze(1)
+X_test = features[14000:]
+z1_test = z1[14000:].unsqueeze(1)
+z2_test = z2[14000:].unsqueeze(1)
+z3_test = z3[14000:].unsqueeze(1)
 
 
 # Train function
@@ -113,7 +175,7 @@ def train_epoch(epoch, model, loss_fn, optimizer, X_train, X_test, y_train, y_te
 
 
 def train():
-    epochs = 5000
+    epochs = 3000
     print('Training Model1 | z = x + y')
     for epoch in range(epochs):
         train_epoch(epoch=epoch, model=model1,

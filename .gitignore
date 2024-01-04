@@ -7,3 +7,8 @@
 *.png
 *.zip
 entropy/*
+
+Toy/vae/Data/*
+Toy/huggingface/*
+
+*.jpg
